@@ -25,6 +25,8 @@ public class RetrofitClient {
                         Request request = chain.request();
                         Response response = chain.proceed(request);
 
+                        // shared Preference 추가
+
                         if (response.code() == 401) { // 401 Unauthorized
                             // Session has expired
                             redirectToLogin(context);
