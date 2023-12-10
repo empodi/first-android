@@ -30,7 +30,7 @@ import java.util.List;
 
 public class RssActivity extends BaseActivity {
     // Your RSS parsing and ListView setup goes here
-    private static final String TAG = "MainActivity_SCSA";
+    private static final String TAG = "mydev";
     ListView listView;
     MyAdapter adapter;
     List<HaniItem> list = new ArrayList<>();
@@ -62,11 +62,11 @@ public class RssActivity extends BaseActivity {
             Intent intent = new Intent(RssActivity.this, ChatActivity.class);
             intent.putExtra("roomId", String.valueOf(selectedItem.getId()));
             startActivity(intent);
+            Log.d(TAG, selectedItem.toString());
             return true;
         });
 
     }
-
 
     class MyAsyncTask extends AsyncTask<String, String, List<HaniItem>> {
 
@@ -131,7 +131,13 @@ public class RssActivity extends BaseActivity {
                         break;
                     case XmlPullParser.END_TAG:
                         name = parser.getName();
-                        if (name.equalsIgnoreCase("item") && item != null) {
+                        if (name.equalsIgnoreCase("item") && item != null && item.getLink() != null) {
+                            String link = item.getLink();
+                            String[] tok = link.split("/");
+                            String lastTok = tok[tok.length - 1];
+                            String hId = lastTok.split("\\.")[0];
+                            item.setId(Long.parseLong(hId));
+                            Log.d(TAG, item.toString());
                             list.add(item);
                         }
                         break;
@@ -149,7 +155,7 @@ public class RssActivity extends BaseActivity {
             ViewHolder holder;
 
             if (convertView == null) {
-                convertView = LayoutInflater.from(RssActivity.this).inflate(R.layout.list_item, viewGroup, false);
+                convertView = LayoutInflater.from(RssActivity.this).inflate(R.layout.rss_list_item, viewGroup, false);
                 holder = new ViewHolder();
                 holder.title = convertView.findViewById(R.id.textViewItemTitle);
                 convertView.setTag(holder);

@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 
 import com.example.myapp.dto.Message;
@@ -26,7 +27,8 @@ public class ChatActivity extends BaseActivity {
     private String roomId;
     private List<Message> messages = new ArrayList<>();
     private ArrayAdapter<String> adapter;
-    private ListView listViewChat;
+    private ExpandableListView expandableListViewChat;
+
     private EditText editTextMessage;
     private String currentUser;
     public static final String TAG = "mydev";
@@ -44,14 +46,17 @@ public class ChatActivity extends BaseActivity {
 
         currentUser = getUserIdFromPreferences();
 
-        listViewChat = findViewById(R.id.listViewChat);
+        expandableListViewChat = findViewById(R.id.expandableListViewChat);
+
         editTextMessage = findViewById(R.id.editTextMessage);
         Button buttonSend = findViewById(R.id.buttonSend);
 
         roomId = getIntent().getStringExtra("roomId"); // Get roomId from Intent
 //        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, messages);
-        MessageAdapter messageAdapter = new MessageAdapter(this, messages);
-        listViewChat.setAdapter(messageAdapter);
+//        MessageAdapter messageAdapter = new MessageAdapter(this, messages);
+        ChatExpandableListAdapter expandableListAdapter = new ChatExpandableListAdapter(this, messages);
+        expandableListViewChat.setAdapter(expandableListAdapter);
+
 
         try {
             mSocket = IO.socket("http://10.0.2.2:8080/"); // Replace with your server URL and port
@@ -81,7 +86,7 @@ public class ChatActivity extends BaseActivity {
 //                Message message = new Message(messageContent, );
                 runOnUiThread(() -> {
                     messages.add(message);
-                    messageAdapter.notifyDataSetChanged();
+                    expandableListAdapter.notifyDataSetChanged();
                 });
             });
 
