@@ -59,7 +59,7 @@ public class ChatActivity extends BaseActivity {
 
 
         try {
-            mSocket = IO.socket("http://10.0.2.2:8080/"); // Replace with your server URL and port
+            mSocket = IO.socket("http://3.34.126.10:8080"); // Replace with your server URL and port
             mSocket.connect();
 
             mSocket.emit("joinRoom", new JSONObject().put("roomId", roomId));
