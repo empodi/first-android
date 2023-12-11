@@ -1,4 +1,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/message_background_other_user" />
     <corners android:radius="8dp" />
     <padding
         android:left="10dp"

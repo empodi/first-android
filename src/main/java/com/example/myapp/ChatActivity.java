@@ -29,6 +29,8 @@ public class ChatActivity extends BaseActivity {
     private ArrayAdapter<String> adapter;
     private ExpandableListView expandableListViewChat;
 
+    private ChatExpandableListAdapter chatExpandableListAdapter;
+
     private EditText editTextMessage;
     private String currentUser;
     public static final String TAG = "mydev";
@@ -54,8 +56,8 @@ public class ChatActivity extends BaseActivity {
         roomId = getIntent().getStringExtra("roomId"); // Get roomId from Intent
 //        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, messages);
 //        MessageAdapter messageAdapter = new MessageAdapter(this, messages);
-        ChatExpandableListAdapter expandableListAdapter = new ChatExpandableListAdapter(this, messages);
-        expandableListViewChat.setAdapter(expandableListAdapter);
+        chatExpandableListAdapter = new ChatExpandableListAdapter(this, messages);
+        expandableListViewChat.setAdapter(chatExpandableListAdapter);
 
 
         try {
@@ -86,7 +88,9 @@ public class ChatActivity extends BaseActivity {
 //                Message message = new Message(messageContent, );
                 runOnUiThread(() -> {
                     messages.add(message);
-                    expandableListAdapter.notifyDataSetChanged();
+                    chatExpandableListAdapter.notifyDataSetChanged();
+                    expandableListViewChat.setSelection(chatExpandableListAdapter.getGroupCount() - 1);
+//                    updateMessagesAndScroll(messages);
                 });
             });
 
