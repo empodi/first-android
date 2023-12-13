@@ -7,9 +7,7 @@ public class HaniItem implements Serializable {
     long id;
     String title;
     String link;
-    String description;
     Date pubDate;
-    String subject;
     String category;
 
     public long getId() {
@@ -36,28 +34,12 @@ public class HaniItem implements Serializable {
         this.link = link;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public Date getPubDate() {
         return pubDate;
     }
 
     public void setPubDate(Date pubDate) {
         this.pubDate = pubDate;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
     }
 
     public String getCategory() {
@@ -74,9 +56,7 @@ public class HaniItem implements Serializable {
                 "id='" + id + '\'' +
                 "title='" + title + '\'' +
                 ", link='" + link + '\'' +
-                ", description='" + description + '\'' +
                 ", pubDate=" + pubDate +
-                ", subject=" + subject +
                 ", category=" + category +
                 '}';
     }
