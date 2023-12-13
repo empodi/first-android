@@ -120,23 +120,24 @@ public class ChatExpandableListAdapter extends BaseExpandableListAdapter {
             textViewTime.setVisibility(View.VISIBLE);
         }
 
-        // Check if the previous message exists and has the same sender
-        if (groupPosition > 0) {
-            Message previousMessage = (Message) getGroup(groupPosition - 1);
-            if (currentMessage.getSender().equals(previousMessage.getSender())) {
-                // Hide sender's name if the same as previous message
-                senderName.setVisibility(View.GONE);
+        if (!currentMessage.isSentByCurrentUser()) {
+            // Check if the previous message exists and has the same sender
+            if (groupPosition > 0) {
+                Message previousMessage = (Message) getGroup(groupPosition - 1);
+                if (currentMessage.getSender().equals(previousMessage.getSender())) {
+                    // Hide sender's name if the same as previous message
+                    senderName.setVisibility(View.GONE);
+                } else {
+                    // Show sender's name if different
+                    senderName.setVisibility(View.VISIBLE);
+                    senderName.setText(currentMessage.getSender());
+                }
             } else {
-                // Show sender's name if different
+                // Always show the sender's name for the first message
                 senderName.setVisibility(View.VISIBLE);
                 senderName.setText(currentMessage.getSender());
             }
-        } else {
-            // Always show the sender's name for the first message
-            senderName.setVisibility(View.VISIBLE);
-            senderName.setText(currentMessage.getSender());
         }
-
         listGroupHeader.setText(currentMessage.getContent());
         listGroupHeader.setText(currentMessage.getContent());
         textViewTime.setText(currentMessage.getFormattedTime());
