@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapp.api.ApiService;
+import com.example.myapp.application.RetrofitClient;
 import com.example.myapp.dto.HaniItem;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -27,6 +29,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RssActivity extends BaseActivity {
     // Your RSS parsing and ListView setup goes here
@@ -65,7 +71,6 @@ public class RssActivity extends BaseActivity {
             Log.d(TAG, selectedItem.toString());
             return true;
         });
-
     }
 
     class MyAsyncTask extends AsyncTask<String, String, List<HaniItem>> {
@@ -87,7 +92,10 @@ public class RssActivity extends BaseActivity {
 
         //data 조회 완료.
         protected void onPostExecute(List<HaniItem> result) {
-            Log.d(TAG, "onPostExecute: "+list.size());
+            Log.d(TAG, "START onPostExecute: "+list.size());
+            postHaniItems(list);
+            fetchHani();
+            Log.d(TAG, "AFTER onPostExecute: "+list.size());
             adapter.notifyDataSetChanged();
         }
 
@@ -113,14 +121,10 @@ public class RssActivity extends BaseActivity {
                                 item.setTitle(parser.nextText());
                             } else if (name.equalsIgnoreCase("link")) {
                                 item.setLink(parser.nextText());
-                            } else if (name.equalsIgnoreCase("description")) {
-                                item.setDescription(parser.nextText());
                             } else if (name.equalsIgnoreCase("pubDate")) {
                                 item.setPubDate(new Date(parser.nextText()));
                             } else if("dc".equalsIgnoreCase(parser.getPrefix())){   // namespace
-                                if (name.equalsIgnoreCase("subject")) {
-                                    item.setSubject(parser.nextText());
-                                }else if (name.equalsIgnoreCase("category")) {
+                                if (name.equalsIgnoreCase("category")) {
                                     item.setCategory(parser.nextText());
                                 }
                             }
@@ -147,6 +151,51 @@ public class RssActivity extends BaseActivity {
         }
     }
 
+    private void postHaniItems(List<HaniItem> haniItems) {
+        ApiService apiService = RetrofitClient.updateHaniService(this);
+        Call<Void> call = apiService.postHaniItems(haniItems);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // Handle successful response
+                    Log.d(TAG, "hani update post successful");
+                } else {
+                    // Handle failure
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // Handle error (network issue, etc.)
+            }
+        });
+    }
+
+    private void fetchHani() {
+        ApiService apiService = RetrofitClient.getAllHaniItem(this);
+        Call<List<HaniItem>> call = apiService.getAllHaniData();
+        call.enqueue(new Callback<List<HaniItem>>() {
+            @Override
+            public void onResponse(Call<List<HaniItem>> call, Response<List<HaniItem>> response) {
+                if (response.isSuccessful()) {
+                    List<HaniItem> dataList = response.body();
+                    Log.d(TAG, "GET req Hani Items. dataList" + dataList.size());
+                    list.addAll(dataList);
+                    adapter.notifyDataSetChanged();
+                    // Handle the received data
+                } else {
+                    // Handle request failure (e.g., response error)
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<HaniItem>> call, Throwable t) {
+
+            }
+        });
+    }
 
     class MyAdapter extends BaseAdapter {
 
@@ -165,6 +214,8 @@ public class RssActivity extends BaseActivity {
 
             HaniItem item = list.get(position);
             holder.title.setText(item.getTitle());
+
+            Log.d(TAG, "from getView. list size = " + list.size());
 
             return convertView;
         }

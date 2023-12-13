@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapp.api.ApiService;
 import com.example.myapp.application.RetrofitClient;
-import com.example.myapp.dto.LoginRequest;
+import com.example.myapp.dto.userRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void performLogin(String username, String password) {
         ApiService apiService = RetrofitClient.getClient(this).create(ApiService.class);
-        Call<Void> call = apiService.loginUser(new LoginRequest(username, password));
+        Call<Void> call = apiService.loginUser(new userRequest(username, password));
 
         call.enqueue(new Callback<Void>() {
             @Override

@@ -30,6 +30,7 @@
         <activity android:name=".RssActivity"/>
         <activity android:name=".RssDetailActivity"/>
         <activity android:name=".ChatActivity"/>
+        <activity android:name=".SignUpActivity"/>
     </application>
 
 </manifest>

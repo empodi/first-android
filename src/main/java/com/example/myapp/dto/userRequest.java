@@ -1,10 +1,10 @@
 package com.example.myapp.dto;
 
-public class LoginRequest {
+public class userRequest {
     private String id;
     private String password;
 
-    public LoginRequest(String id, String password) {
+    public userRequest(String id, String password) {
         this.id = id;
         this.password = password;
     }
