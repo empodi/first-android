@@ -9,6 +9,10 @@
         </trust-anchors>
     </base-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">3.34.126.10</domain>
+        <domain includeSubdomains="true">13.125.231.234 </domain>
     </domain-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+
 </network-security-config>
