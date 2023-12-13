@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.example.myapp.LoginActivity;
+import com.example.myapp.api.ApiService;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -16,7 +17,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
     private static Retrofit retrofit = null;
-    private static final String BASE_URL = "http://3.34.126.10:8080";
+    private static final String BASE_URL = "http://13.125.231.234:8080";
+    private static final String LOCAL_URL = "http://10.0.2.2:8080";
 
     public static Retrofit getClient(Context context) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -41,7 +43,7 @@ public class RetrofitClient {
                     .build();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(LOCAL_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(okHttpClient)
                     .build();
@@ -58,5 +60,20 @@ public class RetrofitClient {
         // Optionally, you can also clear any stored session data here
     }
 
+    public static ApiService getApiService(Context context) {
+        return getClient(context).create(ApiService.class);
+    }
+
+    public static ApiService updateHaniService(Context context) {
+        return getClient(context).create(ApiService.class);
+    }
+
+    public static ApiService getAllHaniItem(Context context) {
+        return getClient(context).create(ApiService.class);
+    }
+
+    public static ApiService checkDuplicateId(Context context) {
+        return getClient(context).create(ApiService.class);
+    }
 }
 
