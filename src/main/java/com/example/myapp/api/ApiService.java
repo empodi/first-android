@@ -2,6 +2,8 @@ package com.example.myapp.api;
 
 import com.example.myapp.UserIdCheckResponse;
 import com.example.myapp.dto.HaniItem;
+import com.example.myapp.dto.Message;
+import com.example.myapp.dto.MessageRequest;
 import com.example.myapp.dto.userRequest;
 
 import java.util.List;
@@ -28,4 +30,10 @@ public interface ApiService {
 
     @GET("/user/check")
     Call<UserIdCheckResponse> checkUserId(@Query("userId") String userId);
+
+    @GET("/chat/all/")
+    Call<List<Message>> getAllChat(@Query("haniRoomId") String haniRoomId);
+
+    @POST("/chat/post")
+    Call<Void> postMessage(@Body MessageRequest messageRequest);
 }
