@@ -25,12 +25,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
         <activity android:name=".LoginActivity"/>
         <activity android:name=".RssActivity"/>
         <activity android:name=".RssDetailActivity"/>
         <activity android:name=".ChatActivity"/>
         <activity android:name=".SignUpActivity"/>
+        <activity android:name=".HistoryActivity" />
     </application>
 
 </manifest>

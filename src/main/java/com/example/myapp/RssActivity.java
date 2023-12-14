@@ -9,11 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.myapp.api.ApiService;
 import com.example.myapp.application.RetrofitClient;
@@ -45,7 +47,18 @@ public class RssActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rss);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+//        Button historyButton = findViewById(R.id.historyButton);
+//        historyButton.setOnClickListener(view -> {
+//            Intent intent = new Intent(this, HistoryActivity.class);
+//            startActivity(intent);
+//        });
+
         showUserIdInAppBar();
+
 
         listView = findViewById(R.id.result);
         adapter = new MyAdapter();
@@ -67,6 +80,7 @@ public class RssActivity extends BaseActivity {
             HaniItem selectedItem = list.get(position);
             Intent intent = new Intent(RssActivity.this, ChatActivity.class);
             intent.putExtra("roomId", String.valueOf(selectedItem.getId()));
+            intent.putExtra("roomTitle", String.valueOf(selectedItem.getTitle()));
             startActivity(intent);
             Log.d(TAG, selectedItem.toString());
             return true;
@@ -152,7 +166,7 @@ public class RssActivity extends BaseActivity {
     }
 
     private void postHaniItems(List<HaniItem> haniItems) {
-        ApiService apiService = RetrofitClient.updateHaniService(this);
+        ApiService apiService = RetrofitClient.getApiService(this);
         Call<Void> call = apiService.postHaniItems(haniItems);
 
         call.enqueue(new Callback<Void>() {
@@ -174,7 +188,7 @@ public class RssActivity extends BaseActivity {
     }
 
     private void fetchHani() {
-        ApiService apiService = RetrofitClient.getAllHaniItem(this);
+        ApiService apiService = RetrofitClient.getApiService(this);
         Call<List<HaniItem>> call = apiService.getAllHaniData();
         call.enqueue(new Callback<List<HaniItem>>() {
             @Override
