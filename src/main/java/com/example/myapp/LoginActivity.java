@@ -83,6 +83,10 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove("userId");
+                editor.remove("password");
                 // Handle error (like network error)
             }
         });

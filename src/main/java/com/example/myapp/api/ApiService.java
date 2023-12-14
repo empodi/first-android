@@ -28,6 +28,9 @@ public interface ApiService {
     @GET("/hani/all")
     Call<List<HaniItem>> getAllHaniData();
 
+    @GET("/hani/user")
+    Call<List<HaniItem>> getHaniItemsByUser(@Query("userId") String userId);
+
     @GET("/user/check")
     Call<UserIdCheckResponse> checkUserId(@Query("userId") String userId);
 

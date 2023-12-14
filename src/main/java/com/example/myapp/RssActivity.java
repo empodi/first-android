@@ -51,14 +51,7 @@ public class RssActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        Button historyButton = findViewById(R.id.historyButton);
-//        historyButton.setOnClickListener(view -> {
-//            Intent intent = new Intent(this, HistoryActivity.class);
-//            startActivity(intent);
-//        });
-
         showUserIdInAppBar();
-
 
         listView = findViewById(R.id.result);
         adapter = new MyAdapter();
