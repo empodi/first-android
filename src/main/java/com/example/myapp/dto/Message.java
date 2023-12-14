@@ -1,5 +1,11 @@
 package com.example.myapp.dto;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.SharedPreferences;
+
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -9,10 +15,11 @@ public class Message {
     private String sender;
     private boolean isSentByCurrentUser; // Or use userId to determine sender
 
-    private Long time;
+    private Date time;
 
-    public boolean isSentByCurrentUser() {
-        return this.isSentByCurrentUser;
+    public boolean isSentByCurrentUser(String currentUser) {
+        if (this.sender == null || currentUser == null) return false;
+        return this.sender.equals(currentUser);
     }
 
     // Constructor, getters, and setters
@@ -21,7 +28,13 @@ public class Message {
         this.content = content;
         this.sender = sender;
         this.isSentByCurrentUser = isSentByCurrentUser;
-        this.time = System.currentTimeMillis();
+        this.time = new Date();
+    }
+
+    public Message(String content, String sender, Date time) {
+        this.content = content;
+        this.sender = sender;
+        this.time = time;
     }
 
     public String getSender() {
@@ -40,13 +53,9 @@ public class Message {
         this.content = content;
     }
 
-    public void setSentByCurrentUser(boolean sentByCurrentUser) {
-        isSentByCurrentUser = sentByCurrentUser;
-    }
-
     public String getFormattedTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        return formatter.format(new Date(this.time));
+        return formatter.format(this.time);
     }
 }
 
