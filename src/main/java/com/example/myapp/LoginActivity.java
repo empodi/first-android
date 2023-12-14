@@ -31,6 +31,16 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        if (isUserLoggedIn()) {
+            SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
+            String userId = sharedPreferences.getString("userId", null);
+            String password = sharedPreferences.getString("password", null);
+            if (!userId.isEmpty() && !password.isEmpty()) {
+                performLogin(userId, password);
+                return; // Stop further execution of onCreate
+            }
+        }
+
         editTextUsername = findViewById(R.id.editTextUsername);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
@@ -42,13 +52,13 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void saveUserIdToPreferences(String userId) {
+    private void saveUserInfoToPreferences(String userId, String password) {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userId", userId);
+        editor.putString("password", password);
         editor.apply();
     }
-
 
     private void performLogin(String username, String password) {
         ApiService apiService = RetrofitClient.getClient(this).create(ApiService.class);
@@ -61,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                     // Handle successful response
                     Log.d(TAG, "login success: " + username);
                     // Inside LoginActivity, when login is successful
-                    saveUserIdToPreferences(username);
+                    saveUserInfoToPreferences(username, password);
                     Intent intent = new Intent(LoginActivity.this, RssActivity.class);
                     startActivity(intent);
                     finish(); // To remove LoginActivity from the back stack
@@ -76,6 +86,11 @@ public class LoginActivity extends AppCompatActivity {
                 // Handle error (like network error)
             }
         });
+    }
+
+    private boolean isUserLoggedIn() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
+        return sharedPreferences.contains("userId") && sharedPreferences.contains("password");
     }
 }
 

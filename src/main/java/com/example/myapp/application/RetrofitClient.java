@@ -2,11 +2,16 @@ package com.example.myapp.application;
 
 import static androidx.core.content.ContextCompat.startActivity;
 
+import android.app.Activity;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.example.myapp.LoginActivity;
 import com.example.myapp.api.ApiService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -19,6 +24,12 @@ public class RetrofitClient {
     private static Retrofit retrofit = null;
     private static final String BASE_URL = "http://13.125.231.234:8080";
     private static final String LOCAL_URL = "http://10.0.2.2:8080";
+
+    public static final String TAG = "mydev";
+
+    private static Gson gson = new GsonBuilder()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+            .create();
 
     public static Retrofit getClient(Context context) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -35,7 +46,10 @@ public class RetrofitClient {
 
                         if (response.code() == 401) { // 401 Unauthorized
                             // Session has expired
+                            Log.d(TAG, "❗️ Not Logged In");
                             redirectToLogin(context);
+                        } else {
+                            Log.d(TAG, "Interceptor = " + response.code());
                         }
 
                         return response;
@@ -43,8 +57,9 @@ public class RetrofitClient {
                     .build();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(LOCAL_URL)
+                    .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(okHttpClient)
                     .build();
         }
@@ -52,27 +67,23 @@ public class RetrofitClient {
     }
 
     private static void redirectToLogin(Context context) {
-        // Create an intent to your LoginActivity
-        Intent intent = new Intent(context, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        // Ensure the context is an Activity context
+        if (context instanceof Activity) {
+            TaskStackBuilder.create(context)
+                    .addNextIntentWithParentStack(new Intent(context, LoginActivity.class))
+                    .startActivities();
 
-        // Optionally, you can also clear any stored session data here
+            ((Activity) context).finish();
+            Log.d(TAG, "Redirect to Login");
+        } else {
+            Log.e(TAG, "Provided context is not an Activity context");
+        }
+
+        // Optionally, clear any stored session data here
     }
+
 
     public static ApiService getApiService(Context context) {
-        return getClient(context).create(ApiService.class);
-    }
-
-    public static ApiService updateHaniService(Context context) {
-        return getClient(context).create(ApiService.class);
-    }
-
-    public static ApiService getAllHaniItem(Context context) {
-        return getClient(context).create(ApiService.class);
-    }
-
-    public static ApiService checkDuplicateId(Context context) {
         return getClient(context).create(ApiService.class);
     }
 }
