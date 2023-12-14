@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,12 @@ import com.example.myapp.api.ApiService;
 import com.example.myapp.application.RetrofitClient;
 import com.example.myapp.dto.userRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -31,14 +38,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if (isUserLoggedIn()) {
-            SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
-            String userId = sharedPreferences.getString("userId", null);
-            String password = sharedPreferences.getString("password", null);
-            if (!userId.isEmpty() && !password.isEmpty()) {
-                performLogin(userId, password);
-                return; // Stop further execution of onCreate
-            }
+        if (isTokenAvailable()) {
+            navigateToRssActivity();
+            return;
         }
 
         editTextUsername = findViewById(R.id.editTextUsername);
@@ -52,49 +54,52 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void saveUserInfoToPreferences(String userId, String password) {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("userId", userId);
-        editor.putString("password", password);
-        editor.apply();
-    }
-
     private void performLogin(String username, String password) {
-        ApiService apiService = RetrofitClient.getClient(this).create(ApiService.class);
-        Call<Void> call = apiService.loginUser(new userRequest(username, password));
 
-        call.enqueue(new Callback<Void>() {
+        ApiService apiService = RetrofitClient.getClient(this).create(ApiService.class);
+        Call<ResponseBody> call = apiService.loginUser(new userRequest(username, password));
+        call.enqueue(new Callback<ResponseBody>() { // Change Void to ResponseBody or your token response class
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    // Handle successful response
-                    Log.d(TAG, "login success: " + username);
-                    // Inside LoginActivity, when login is successful
-                    saveUserInfoToPreferences(username, password);
-                    Intent intent = new Intent(LoginActivity.this, RssActivity.class);
-                    startActivity(intent);
-                    finish(); // To remove LoginActivity from the back stack
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        String responseBody = response.body().string();
+                        // Assuming the response is a JSON object with a field named "token"
+                        JSONObject jsonObject = new JSONObject(responseBody);
+                        String token = jsonObject.getString("token");
+                        saveInfo(token, username);
+                        navigateToRssActivity();
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
+                    }
                 } else {
-                    // Handle unsuccessful response, such as authentication failure
-                    Log.d(TAG, "login fail: " + username);
+                    // Handle unsuccessful response
                 }
             }
-
             @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove("userId");
-                editor.remove("password");
-                // Handle error (like network error)
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                // Handle error
             }
         });
     }
 
-    private boolean isUserLoggedIn() {
+    private void saveInfo(String token, String username) {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
-        return sharedPreferences.contains("userId") && sharedPreferences.contains("password");
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("userId", username);
+        editor.putString("authToken", token);
+        editor.apply();
+    }
+
+    private boolean isTokenAvailable() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
+        return sharedPreferences.contains("authToken");
+    }
+
+    private void navigateToRssActivity() {
+        Intent intent = new Intent(LoginActivity.this, RssActivity.class);
+        startActivity(intent);
+        finish(); // Finish LoginActivity to prevent returning to it
     }
 }
 

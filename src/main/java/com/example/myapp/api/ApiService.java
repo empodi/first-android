@@ -8,6 +8,7 @@ import com.example.myapp.dto.userRequest;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -17,12 +18,12 @@ import retrofit2.http.Query;
 public interface ApiService {
 
     @POST("user/login")
-    Call<Void> loginUser(@Body userRequest userRequest);
+    Call<ResponseBody> loginUser(@Body userRequest userRequest);
 
     @POST("user/signup")
     Call<Void> signUpUser(@Body userRequest userRequest);
 
-    @POST("/hani/update") // Replace with your actual endpoint
+    @POST("/hani/update")
     Call<Void> postHaniItems(@Body List<HaniItem> haniItems);
 
     @GET("/hani/all")
