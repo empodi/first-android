@@ -16,12 +16,15 @@ import java.util.List;
 
 public class ChatExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
+
+    private String currentUser;
     private List<Message> listDataHeader; // header titles
 
     // Constructor
-    public ChatExpandableListAdapter(Context context, List<Message> listDataHeader) {
+    public ChatExpandableListAdapter(Context context, List<Message> listDataHeader, String currentUser) {
         this.context = context;
         this.listDataHeader = listDataHeader;
+        this.currentUser = currentUser;
     }
 
     @Override
@@ -79,13 +82,47 @@ public class ChatExpandableListAdapter extends BaseExpandableListAdapter {
         RelativeLayout.LayoutParams senderLayoutParams = (RelativeLayout.LayoutParams) senderName.getLayoutParams();
         RelativeLayout.LayoutParams messageLayoutParams = (RelativeLayout.LayoutParams) messageLayout.getLayoutParams();
 
+        // Check if the next message exists and has the same time and sender
+        if (groupPosition < getGroupCount() - 1) {
+            Message nextMessage = (Message) getGroup(groupPosition + 1);
+            if (currentMessage.getFormattedTime().equals(nextMessage.getFormattedTime())
+                    && currentMessage.getSender().equals(nextMessage.getSender())) {
+                // Hide time if the next message has the same time and sender
+                textViewTime.setVisibility(View.GONE);
+            } else {
+                // Show time otherwise
+                textViewTime.setVisibility(View.VISIBLE);
+            }
+        } else {
+            // Show time for the last message
+            textViewTime.setVisibility(View.VISIBLE);
+        }
+
+        // Check if the previous message exists and has the same sender
+        if (groupPosition > 0) {
+            Message previousMessage = (Message) getGroup(groupPosition - 1);
+            if (currentMessage.getSender().equals(previousMessage.getSender())) {
+                // Hide sender's name if the same as previous message
+                senderName.setVisibility(View.GONE);
+            } else {
+                // Show sender's name if different
+                senderName.setVisibility(View.VISIBLE);
+                senderName.setText(currentMessage.getSender());
+            }
+        } else {
+            // Always show the sender's name for the first message
+            senderName.setVisibility(View.VISIBLE);
+            senderName.setText(currentMessage.getSender());
+        }
+
         // Adjust alignment based on the sender
-        if (currentMessage.isSentByCurrentUser()) {
+        if (currentMessage.isSentByCurrentUser(this.currentUser)) {
             // For messages sent by the current user, align to the right
             messageLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
             senderLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
             senderLayoutParams.removeRule(RelativeLayout.ALIGN_PARENT_START);
             messageLayoutParams.removeRule(RelativeLayout.ALIGN_PARENT_START);
+            senderName.setVisibility(View.GONE);
 
             messageLayout.setGravity(Gravity.END);
             messageLayout.removeView(textViewTime);
@@ -104,40 +141,6 @@ public class ChatExpandableListAdapter extends BaseExpandableListAdapter {
             listGroupHeader.setBackgroundResource(R.drawable.message_background_other_user);
         }
 
-        // Check if the next message exists and has the same time and sender
-        if (groupPosition < getGroupCount() - 1) {
-            Message nextMessage = (Message) getGroup(groupPosition + 1);
-            if (currentMessage.getFormattedTime().equals(nextMessage.getFormattedTime())
-                    && currentMessage.getSender().equals(nextMessage.getSender())) {
-                // Hide time if the next message has the same time and sender
-                textViewTime.setVisibility(View.GONE);
-            } else {
-                // Show time otherwise
-                textViewTime.setVisibility(View.VISIBLE);
-            }
-        } else {
-            // Show time for the last message
-            textViewTime.setVisibility(View.VISIBLE);
-        }
-
-        if (!currentMessage.isSentByCurrentUser()) {
-            // Check if the previous message exists and has the same sender
-            if (groupPosition > 0) {
-                Message previousMessage = (Message) getGroup(groupPosition - 1);
-                if (currentMessage.getSender().equals(previousMessage.getSender())) {
-                    // Hide sender's name if the same as previous message
-                    senderName.setVisibility(View.GONE);
-                } else {
-                    // Show sender's name if different
-                    senderName.setVisibility(View.VISIBLE);
-                    senderName.setText(currentMessage.getSender());
-                }
-            } else {
-                // Always show the sender's name for the first message
-                senderName.setVisibility(View.VISIBLE);
-                senderName.setText(currentMessage.getSender());
-            }
-        }
         listGroupHeader.setText(currentMessage.getContent());
         listGroupHeader.setText(currentMessage.getContent());
         textViewTime.setText(currentMessage.getFormattedTime());
