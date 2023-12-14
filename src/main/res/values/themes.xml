@@ -3,7 +3,32 @@
     <style name="Base.Theme.Myapp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:itemTextAppearance">@style/MyMenuItemTextStyle</item>
+        <item name="android:popupMenuStyle">@style/MyPopupMenu</item>
     </style>
 
     <style name="Theme.Myapp" parent="Base.Theme.Myapp" />
+    <style name="MainToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <!-- Set the text color to white -->
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <!-- Set the text appearance to bold -->
+        <item name="android:textAppearance">@style/MyToolbarTitleText</item>
+    </style>
+
+    <!-- Style for bold text appearance -->
+    <style name="MyToolbarTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MyMenuItemTextStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+        <!-- Add more styling attributes if needed -->
+    </style>
+
+    <style name="MyPopupMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <!-- Change the background color -->
+        <item name="android:popupBackground">@color/cardview_dark_background</item>
+        <!-- You can also customize other attributes like text color, divider, etc. -->
+    </style>
 </resources>
