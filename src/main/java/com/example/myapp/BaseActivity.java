@@ -78,6 +78,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove("userId");
+        editor.remove("password");
         editor.apply();
     }
 
