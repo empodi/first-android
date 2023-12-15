@@ -48,6 +48,13 @@ public class HistoryActivity extends BaseActivity {
 
         fetchHaniItems();
 
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            HaniItem selectedItem = list.get(position);
+            Intent detailIntent = new Intent(HistoryActivity.this, RssDetailActivity.class);
+            detailIntent.putExtra("rssItem", selectedItem); // Ensure selectedItem is Parcelable or Serializable
+            startActivity(detailIntent);
+        });
+
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             HaniItem selectedItem = list.get(position);
             Intent intent = new Intent(HistoryActivity.this, ChatActivity.class);
