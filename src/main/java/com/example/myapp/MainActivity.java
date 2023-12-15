@@ -1,18 +1,20 @@
 package com.example.myapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "MyAppPreferences";
     private static final String TOKEN_KEY = "token";
     private static final String USER_ID_KEY = "userId";
+
+    public static final String TAG = "mydev";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
