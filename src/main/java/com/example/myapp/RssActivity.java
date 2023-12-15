@@ -1,6 +1,10 @@
 package com.example.myapp;
 
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,12 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.myapp.api.ApiService;
@@ -43,6 +45,12 @@ public class RssActivity extends BaseActivity {
     MyAdapter adapter;
     List<HaniItem> list = new ArrayList<>();
 
+    NfcAdapter nfcAdapter;
+
+    PendingIntent pIntent;
+
+    IntentFilter[] filters;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,14 +68,12 @@ public class RssActivity extends BaseActivity {
         new MyAsyncTask().execute("https://www.hani.co.kr/rss/");
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
-//            Toast.makeText(this, list.get(position)+"clicked", Toast.LENGTH_SHORT).show();
-
             HaniItem selectedItem = list.get(position);
-
             Intent detailIntent = new Intent(RssActivity.this, RssDetailActivity.class);
-            detailIntent.putExtra("rssItem", selectedItem);
+            detailIntent.putExtra("rssItem", selectedItem); // Ensure selectedItem is Parcelable or Serializable
             startActivity(detailIntent);
         });
+
 
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             HaniItem selectedItem = list.get(position);
@@ -78,6 +84,28 @@ public class RssActivity extends BaseActivity {
             Log.d(TAG, selectedItem.toString());
             return true;
         });
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (nfcAdapter == null) {
+            Toast.makeText(this, "NFC is not supported on this device.", Toast.LENGTH_LONG).show();
+        } else if (!nfcAdapter.isEnabled()) {
+            Toast.makeText(this, "NFC is disabled.", Toast.LENGTH_LONG).show();
+        }
+        if (nfcAdapter.isEnabled()) {
+            Toast.makeText(this, "NFC is Enabled.", Toast.LENGTH_LONG).show();
+        }
+
+        Intent i = new Intent(this, RssActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        pIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_MUTABLE);
+        IntentFilter filter = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+
+        try {
+            filter.addDataType("*/*");
+        } catch (IntentFilter.MalformedMimeTypeException e) {
+            e.printStackTrace();
+        }
+        filters = new IntentFilter[] {filter,};
     }
 
     class MyAsyncTask extends AsyncTask<String, String, List<HaniItem>> {
@@ -247,4 +275,41 @@ public class RssActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Toast.makeText(this, "onNewIntent", Toast.LENGTH_SHORT).show();
+
+//        Log.d(TAG, "New Intent action : " + action);
+
+        performLogout();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        nfcAdapter.enableForegroundDispatch(this, pIntent, filters, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    private void performLogout() {
+        clearUserIdFromPreferences();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void clearUserIdFromPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("userId");
+        editor.remove("authToken");
+        editor.apply();
+    }
 }
