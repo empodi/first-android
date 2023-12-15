@@ -12,18 +12,6 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/MainToolbarTheme">
 
-<!--        <RelativeLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent">-->
-
-<!--            <Button-->
-<!--                android:id="@+id/historyButton"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_alignParentEnd="true"-->
-<!--                android:text="History" />-->
-<!--        </RelativeLayout>-->
-
     </androidx.appcompat.widget.Toolbar>
 
     <TextView
