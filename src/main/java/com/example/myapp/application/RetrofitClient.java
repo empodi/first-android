@@ -1,12 +1,10 @@
 package com.example.myapp.application;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import com.example.myapp.LoginActivity;
+import com.example.myapp.MainActivity;
 import com.example.myapp.api.ApiService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -63,7 +61,8 @@ public class RetrofitClient {
                     Response response = chain.proceed(request);
 
                     if (response.code() == 401 || response.code() == 403) { // Unauthorized
-                        redirectToLogin(context);
+                        clearAuthData(context);
+                        redirectToMain(context);
                     }
 
                     return response;
@@ -81,10 +80,20 @@ public class RetrofitClient {
         return retrofit;
     }
 
-    private static void redirectToLogin(Context context) {
-        Intent intent = new Intent(context, LoginActivity.class);
+    private static void redirectToMain(Context context) {
+        clearAuthData(context);
+
+        Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
+    }
+
+    private static void clearAuthData(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("userId");
+        editor.remove(TOKEN_KEY);
+        editor.apply();
     }
 
     public static ApiService getApiService(Context context) {
